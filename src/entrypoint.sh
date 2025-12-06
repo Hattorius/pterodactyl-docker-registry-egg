@@ -44,23 +44,20 @@ log:
     service: registry
 
 storage:
-# Add HTTP section with TLS
-cat >> "${RUNTIME_CONFIG}" <<EOF
+  filesystem:
+    rootdirectory: ${REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY}
+EOF
 
-http:
-  addr: ${REGISTRY_HTTP_ADDR}
-  headers:
-    X-Content-Type-Options: [nosniff]
-  tls:
-    certificate: ${TLS_CERT}
-    key: ${TLS_KEY}
+# Handle authentication
+HTPASSWD_FILE="/home/container/htpasswd"
+AUTH_USERNAME="${REGISTRY_AUTH_USERNAME}"
+AUTH_PASSWORD="${REGISTRY_AUTH_PASSWORD}"
 
-health:
-  storagedriver:
-    enabled: true
-    interval: 10s
-    threshold: 3
-EOF[ -n "${AUTH_USERNAME}" ] && [ -n "${AUTH_PASSWORD}" ]; then
+# Unset these variables to prevent Docker Registry from reading them as env overrides
+unset REGISTRY_AUTH_USERNAME
+unset REGISTRY_AUTH_PASSWORD
+
+if [ -n "${AUTH_USERNAME}" ] && [ -n "${AUTH_PASSWORD}" ]; then
     echo "[entrypoint] Setting up authentication for user: ${AUTH_USERNAME}"
     htpasswd -Bbn "${AUTH_USERNAME}" "${AUTH_PASSWORD}" > "${HTPASSWD_FILE}"
     chmod 600 "${HTPASSWD_FILE}"
@@ -79,27 +76,30 @@ else
     rm -f "${HTPASSWD_FILE}"
 fi
 
-# Add HTTP section
+# Add HTTP section with TLS
 cat >> "${RUNTIME_CONFIG}" <<EOF
 
-echo "[entrypoint] Starting Docker Registry..."
-echo "[entrypoint] Protocol: ${PROTOCOL}"
-echo "[entrypoint] Using configuration: ${RUNTIME_CONFIG}"
-echo "[entrypoint] Data dir: ${REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY}"
-echo "[entrypoint] Listen addr: ${REGISTRY_HTTP_ADDR}"
+http:
+  addr: ${REGISTRY_HTTP_ADDR}
+  headers:
+    X-Content-Type-Options: [nosniff]
+  tls:
+    certificate: ${TLS_CERT}
+    key: ${TLS_KEY}
 
 health:
   storagedriver:
     enabled: true
+    interval: 10s
+    threshold: 3
+EOF
+
 echo "[entrypoint] Starting Docker Registry..."
 echo "[entrypoint] Protocol: HTTPS"
 echo "[entrypoint] Using configuration: ${RUNTIME_CONFIG}"
 echo "[entrypoint] Data dir: ${REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY}"
 echo "[entrypoint] Listen addr: ${REGISTRY_HTTP_ADDR}"
 echo "[entrypoint] Certificate: ${TLS_CERT}"
-echo "[entrypoint] Using configuration: ${RUNTIME_CONFIG}"
-echo "[entrypoint] Data dir: ${REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY}"
-echo "[entrypoint] HTTP addr: ${REGISTRY_HTTP_ADDR}"
 echo "[entrypoint] --- Config file contents ---"
 cat "${RUNTIME_CONFIG}"
 echo "[entrypoint] --- End of config ---"
