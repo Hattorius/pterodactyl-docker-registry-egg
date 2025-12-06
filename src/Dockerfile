@@ -10,7 +10,8 @@ RUN apk add --no-cache \
         ca-certificates \
         tzdata \
         dumb-init \
-        apache2-utils && \
+        apache2-utils \
+        openssl && \
     update-ca-certificates
 
 RUN adduser -D -h /home/container container && \
@@ -20,11 +21,11 @@ RUN adduser -D -h /home/container container && \
 COPY --chown=root:root entrypoint.sh /usr/local/bin/entrypoint.sh
 
 RUN chmod +x /usr/local/bin/entrypoint.sh
-
 USER container
 WORKDIR /home/container
 
-EXPOSE 5000
+EXPOSE 5443
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD ["/usr/local/bin/entrypoint.sh"]-"]
 CMD ["/usr/local/bin/entrypoint.sh"]
