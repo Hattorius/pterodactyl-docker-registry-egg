@@ -30,9 +30,16 @@ EOF
 
 # Handle authentication
 HTPASSWD_FILE="/home/container/htpasswd"
-if [ -n "${REGISTRY_AUTH_USERNAME}" ] && [ -n "${REGISTRY_AUTH_PASSWORD}" ]; then
-    echo "[entrypoint] Setting up authentication for user: ${REGISTRY_AUTH_USERNAME}"
-    htpasswd -Bbn "${REGISTRY_AUTH_USERNAME}" "${REGISTRY_AUTH_PASSWORD}" > "${HTPASSWD_FILE}"
+AUTH_USERNAME="${REGISTRY_AUTH_USERNAME}"
+AUTH_PASSWORD="${REGISTRY_AUTH_PASSWORD}"
+
+# Unset these variables to prevent Docker Registry from reading them as env overrides
+unset REGISTRY_AUTH_USERNAME
+unset REGISTRY_AUTH_PASSWORD
+
+if [ -n "${AUTH_USERNAME}" ] && [ -n "${AUTH_PASSWORD}" ]; then
+    echo "[entrypoint] Setting up authentication for user: ${AUTH_USERNAME}"
+    htpasswd -Bbn "${AUTH_USERNAME}" "${AUTH_PASSWORD}" > "${HTPASSWD_FILE}"
     chmod 600 "${HTPASSWD_FILE}"
     
     # Add auth section to config
