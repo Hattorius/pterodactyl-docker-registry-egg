@@ -17,9 +17,9 @@ RUN adduser -D -h /home/container container && \
     chown -R container:container /home/container /etc/docker/registry
 
 COPY --chown=container:container registry-config.yml /etc/docker/registry/config.yml
-COPY --chown=container:container entrypoint.sh /home/container/entrypoint.sh
+COPY --chown=root:root entrypoint.sh /usr/local/bin/entrypoint.sh
 
-RUN chmod +x /home/container/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 USER container
 WORKDIR /home/container
@@ -27,4 +27,4 @@ WORKDIR /home/container
 EXPOSE 5000
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD ["bash", "-c", "${STARTUP}"]
+CMD ["/usr/local/bin/entrypoint.sh"]
