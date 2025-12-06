@@ -1,0 +1,72 @@
+{
+  "_comment": "Pterodactyl Egg for a self-hosted Docker Registry",
+  "meta": {
+    "version": "PTDL_v2",
+    "update_url": null
+  },
+  "exported_at": "2025-12-06T00:00:00+00:00",
+  "name": "Docker Registry",
+  "author": "dontmailme.output543@passinbox.com",
+  "description": "Runs a Docker Registry (distribution) inside Pterodactyl.",
+  "features": null,
+  "docker_images": {
+    "Docker Registry": "ghcr.io/hattorius/pterodactyl-docker-registry-egg:latest"
+  },
+  "file_denylist": [],
+  "startup": "/usr/local/bin/entrypoint.sh",
+  "config": {
+    "files": "{}",
+    "startup": "{\n    \"done\": \"listening on\"\n}",
+    "logs": "{}",
+    "stop": "^C"
+  },
+  "scripts": {
+    "installation": {
+      "script": "#!/bin/ash\n# Docker Registry: no install step required.\n# Server files live in /home/container (mapped from /mnt/server).\n# The entrypoint.sh is baked into the image at /usr/local/bin/entrypoint.sh\nmkdir -p /mnt/server/registry\necho 'Installation complete. Registry data will be stored in /home/container/registry'\n",
+      "container": "ghcr.io/pterodactyl/installers:alpine",
+      "entrypoint": "ash"
+    }
+  },
+  "variables": [
+    {
+      "name": "Registry Log Level",
+      "description": "Log level for the registry (error, warn, info, debug).",
+      "env_variable": "REGISTRY_LOG_LEVEL",
+      "default_value": "info",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|in:error,warn,info,debug",
+      "field_type": "text"
+    },
+    {
+      "name": "Registry Data Directory",
+      "description": "Path the registry will use to store image data.",
+      "env_variable": "REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY",
+      "default_value": "/home/container/registry",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string",
+      "field_type": "text"
+    },
+    {
+      "name": "Registry Auth Username",
+      "description": "Username for registry authentication. Leave empty to disable auth (public access).",
+      "env_variable": "REGISTRY_AUTH_USERNAME",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "nullable|string|max:255",
+      "field_type": "text"
+    },
+    {
+      "name": "Registry Auth Password",
+      "description": "Password for registry authentication. Required if username is set.",
+      "env_variable": "REGISTRY_AUTH_PASSWORD",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "nullable|string",
+      "field_type": "text"
+    }
+  ]
+}
