@@ -15,6 +15,19 @@ export REGISTRY_HTTP_ADDR
 : "${REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY:=/home/container/registry}"
 mkdir -p "${REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY}"
 
+# Handle authentication
+HTPASSWD_FILE="/home/container/htpasswd"
+if [ -n "${REGISTRY_AUTH_USERNAME}" ] && [ -n "${REGISTRY_AUTH_PASSWORD}" ]; then
+    echo "[entrypoint] Setting up authentication for user: ${REGISTRY_AUTH_USERNAME}"
+    htpasswd -Bbn "${REGISTRY_AUTH_USERNAME}" "${REGISTRY_AUTH_PASSWORD}" > "${HTPASSWD_FILE}"
+    chmod 600 "${HTPASSWD_FILE}"
+else
+    echo "[entrypoint] WARNING: No authentication configured. Registry is publicly accessible!"
+    echo "[entrypoint] Set REGISTRY_AUTH_USERNAME and REGISTRY_AUTH_PASSWORD to enable auth."
+    # Remove htpasswd file if it exists to disable auth
+    rm -f "${HTPASSWD_FILE}"
+fi
+
 echo "[entrypoint] Starting Docker Registry..."
 echo "[entrypoint] Using configuration: ${REGISTRY_CONFIGURATION}"
 echo "[entrypoint] Data dir: ${REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY}"

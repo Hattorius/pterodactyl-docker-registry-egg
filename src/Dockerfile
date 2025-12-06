@@ -9,7 +9,8 @@ RUN apk add --no-cache \
         bash \
         ca-certificates \
         tzdata \
-        dumb-init && \
+        dumb-init \
+        apache2-utils && \
     update-ca-certificates
 
 RUN adduser -D -h /home/container container && \

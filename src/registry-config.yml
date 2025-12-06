@@ -10,6 +10,11 @@ storage:
   filesystem:
     rootdirectory: /home/container/registry
 
+auth:
+  htpasswd:
+    realm: Registry Realm
+    path: /home/container/htpasswd
+
 http:
   addr: 0.0.0.0:5000
   headers:
