@@ -68,6 +68,9 @@ echo "[entrypoint] Starting Docker Registry..."
 echo "[entrypoint] Using configuration: ${RUNTIME_CONFIG}"
 echo "[entrypoint] Data dir: ${REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY}"
 echo "[entrypoint] HTTP addr: ${REGISTRY_HTTP_ADDR}"
+echo "[entrypoint] --- Config file contents ---"
+cat "${RUNTIME_CONFIG}"
+echo "[entrypoint] --- End of config ---"
 
 # Start the registry (Alpine package binary is 'docker-registry')
 exec docker-registry serve "${RUNTIME_CONFIG}"
