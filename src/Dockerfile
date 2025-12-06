@@ -14,10 +14,9 @@ RUN apk add --no-cache \
     update-ca-certificates
 
 RUN adduser -D -h /home/container container && \
-    mkdir -p /home/container /home/container/registry /etc/docker/registry && \
-    chown -R container:container /home/container /etc/docker/registry
+    mkdir -p /home/container /home/container/registry && \
+    chown -R container:container /home/container
 
-COPY --chown=container:container registry-config.yml /etc/docker/registry/config.yml
 COPY --chown=root:root entrypoint.sh /usr/local/bin/entrypoint.sh
 
 RUN chmod +x /usr/local/bin/entrypoint.sh
